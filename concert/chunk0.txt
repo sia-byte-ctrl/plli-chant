@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KEEP IT MANIC · INCHEON PLANNER</title>
+<style>
+:root{
+  --bg:#f7f9ff;
+  --bg2:#eef6ff;
+  --card:#ffffff;
+  --ink:#171a24;
+  --muted:#70798d;
+  --line:#dfe7f5;
+  --blue:#72c9ff;
+  --blue2:#bfe9ff;
+  --purple:#a98cff;
+  --pink:#ff9dcb;
+  --red:#e52b37;
+  --red2:#9f131c;
+  --black:#17171a;
+  --yellow:#ffe083;
+  --shadow:0 14px 36px rgba(70,92,140,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(114,201,255,.22),transparent 23%),
+    radial-gradient(circle at 92% 8%,rgba(169,140,255,.16),transparent 20%),
+    linear-gradient(180deg,#fbfdff 0%,var(--bg) 45%,#f8f9ff 100%);
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1280px;margin:auto;padding:18px 18px 110px}
+
+/* PLAVE-ish decorative atmosphere without copying official logos */
+.sky-deco{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:-1}
+.orbit{position:absolute;border:1px solid rgba(114,201,255,.22);border-radius:50%}
+.orbit.o1{width:360px;height:360px;right:-150px;top:80px}
+.orbit.o2{width:240px;height:240px;left:-100px;top:420px;border-color:rgba(169,140,255,.18)}
+.spark{position:absolute;color:#9fdcff;opacity:.65;font-size:20px}
+.spark.s1{top:100px;left:6%}.spark.s2{top:330px;right:7%;color:#c1a8ff}.spark.s3{top:690px;left:10%;color:#ffb4d6}
+.five-dots{display:flex;gap:7px;align-items:center}
+.five-dots i{width:9px;height:9px;border-radius:50%;display:block;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.five-dots i:nth-child(1){background:#69c7ff}
+.five-dots i:nth-child(2){background:#a98cff}
+.five-dots i:nth-child(3){background:#ff98c7}
+.five-dots i:nth-child(4){background:#e52b37}
+.five-dots i:nth-child(5){background:#1e2027}
+
+/* Hero */
+.hero{
+  position:relative;overflow:hidden;
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(196,215,241,.9);
+  border-radius:28px;
+  box-shadow:var(--shadow);
+  padding:26px;
+}
+.hero:after{
+  content:"";
+  position:absolute;width:260px;height:260px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(114,201,255,.26),rgba(169,140,255,.08),rgba(229,43,55,.12));
+  right:-95px;top:-120px;
+}
+.topbrand{display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative;z-index:1}
+.eyebrow{font-size:12px;letter-spacing:.18em;font-weight:900;color:#5aaedf}
+h1{font-size:clamp(30px,5vw,58px);line-height:.96;letter-spacing:-.05em;margin:10px 0 8px}
+.subtitle{font-size:14px;color:var(--muted)}
+.dress{
+  display:inline-flex;align-items:center;gap:8px;margin-top:15px;
+  border:1px solid #ebd2d4;background:#fff7f7;border-radius:999px;padding:8px 11px;
+  color:#6d2026;font-size:12px;font-weight:800
+}
+.dress .r,.dress .b{width:12px;height:12px;border-radius:50%}
+.dress .r{background:var(--red)} .dress .b{background:var(--black)}
+.quick{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px;position:relative;z-index:1
+}
+.quick .q{
+  background:linear-gradient(180deg,#fff,#f8fbff);
+  border:1px solid var(--line);border-radius:16px;padding:12px
+}
+.q b{display:block;font-size:13px}.q span{font-size:12px;color:var(--muted)}
+
+/* Controls */
+.toolbar{
+  position:sticky;top:0;z-index:30;
+  background:linear-gradient(180deg,rgba(247,249,255,.98),rgba(247,249,255,.9),rgba(247,249,255,0));
+  backdrop-filter:blur(10px);padding:12px 0 8px;margin-top:8px
+}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{
+  border:1px solid var(--line);background:white;color:var(--ink);
+  border-radius:13px;padding:9px 12px;font-size:13px;font-weight:850
+}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,#7bd0ff,#ae95ff);border:none;color:#152033}
+.btn.red{background:linear-gradient(135deg,#f14650,#c81823);color:white;border:none}
+.btn.black{background:#202126;color:white;border-color:#202126}
+.btn.small{font-size:11px;padding:6px 8px;border-radius:10px}
+.person-filter{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.pill{
+  border:1px solid var(--line);background:#fff;color:#566078;
+  border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800
+}
+.pill.active{background:#e8f6ff;border-color:#a7dfff;color:#2875a4}
+.saved{margin-left:auto;font-size:12px;color:#2f9860;font-weight:800}
+
+/* All schedule overview — simple compact view */
+.section-head{
+  display:flex;justify-content:space-between;align-items:end;gap:12px;
+  margin:20px 2px 10px
+}
+.section-head h2{margin:0;font-size:21px;letter-spacing:-.03em}
+.section-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+
+.overview{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.day{
+  min-width:0;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:17px;
+  overflow:hidden;
+  box-shadow:none;
+}
+.dayhead{
+  padding:13px 14px 11px;
+  border-bottom:1px solid #edf1f7;
+  background:#fff;
+}
+.dayhead .date{
+  font-size:15px;
+  font-weight:950;
+  letter-spacing:-.02em
+}
+.dayhead .desc{
+  font-size:10.5px;
+  color:#8a93a5;
+  margin-top:3px
+}
+.dayhead.first{border-top:3px solid #e52b37}
+.dayhead.last{border-top:3px solid #202126}
+.dayhead.out{border-top:3px solid #7bcfff}
+
+.list{padding:4px 10px 8px}
+
+.event{
+  display:grid;
+  grid-template-columns:58px 1fr;
+  gap:8px;
+  padding:9px 4px;
+  border-bottom:1px solid #f0f3f7;
+  position:relative;
+  cursor:pointer;
+  transition:background .15s ease;
+}
+.event:hover{background:#fafcff}
+.event:last-child{border-bottom:none}
+
+.event .time{
+  font-weight:900;
+  font-size:12px;
+  color:#566078;
+  line-height:1.35;
+  padding-top:1px
+}
+.event .content{min-width:0}
+.event .title{
+  font-size:12.5px;
+  font-weight:850;
+  line-height:1.35;
+  color:#20242e
+}
+.event .place{display:none}
+
+.event.official .title:b
