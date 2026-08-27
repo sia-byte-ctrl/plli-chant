@@ -1,0 +1,136 @@
+t)?"conflict":""}"
+            onclick="editItem('${it.id}')"
+            title="눌러서 수정"
+          >
+            <div class="time">${esc(it.time)}</div>
+            <div class="content">
+              <div class="title">${esc(it.title)}</div>
+              <div class="chips">
+                ${names ? `<span class="chip ${isVip(it)?"vip":""}">${esc(names)}</span>` : ""}
+                ${statusText ? `<span class="chip warn">${esc(statusText.replace(" · ",""))}</span>` : ""}
+                ${conflictText ? `<span class="chip warn">${esc(conflictText.replace(" · ",""))}</span>` : ""}
+              </div>
+            </div>
+          </article>`
+        }).join("") || `<div style="padding:18px;color:#939bad;text-align:center;font-size:12px">표시할 일정 없음</div>`}
+      </div>
+    </section>`
+  }).join("");
+}
+
+function copyAddress(text){
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>alert("주소를 복사했어."));
+  }else{
+    prompt("주소를 복사해줘.",text);
+  }
+}
+function renderEvents(){
+  const root=document.getElementById("eventsRoot");
+  if(!root)return;
+  const groups=[...new Set(eventsData.map(e=>e.group))];
+  root.innerHTML=groups.map(group=>{
+    const entries=eventsData.filter(e=>e.group===group);
+    return `
+      <div class="event-section-title">${esc(group)}</div>
+      <div class="eventcards">
+        ${entries.map(e=>`
+          <article class="eventcard ${e.kind}">
+            <div class="eventtop">
+              <div class="eventname">${esc(e.name)}</div>
+              <span class="eventbadge ${e.kind==="fan"?"fan":(e.status.includes("필요")?"check":"")}">${esc(e.badge)}</span>
+            </div>
+            <div class="eventmeta">
+              <div class="eventline"><div class="k">날짜</div><div class="v">${esc(e.date)}</div></div>
+              <div class="eventline"><div class="k">시간</div><div class="v">${esc(e.time)}</div></div>
+              <div class="eventline"><div class="k">장소</div><div class="v">${esc(e.place)}</div></div>
+              <div class="eventline"><div class="k">주소</div><div class="v">${esc(e.address)}</div></div>
+              <div class="eventline"><div class="k">상태</div><div class="v">${esc(e.status)}</div></div>
+            </div>
+            <div class="eventdesc">${esc(e.desc)}</div>
+            <div class="eventactions">
+              <button class="btn small" onclick='copyAddress(${JSON.stringify(e.address)})'>주소 복사</button>
+              <a class="eventlink" href="${e.map}" target="_blank" rel="noopener">지도 열기</a>
+              <a class="eventlink" href="${e.source}" target="_blank" rel="noopener">공지/출처</a>
+            </div>
+          </article>
+        `).join("")}
+      </div>
+    `;
+  }).join("");
+}
+
+function renderParking(){
+  if(!data.parking) data.parking={name:"",address:"",fee:"",status:"미정",note:""};
+  const p=data.parking;
+  const set=(id,value,fallback="미정")=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.textContent=value||fallback;
+    el.classList.toggle("parking-empty",!value);
+  };
+  set("parkingName",p.name);
+  set("parkingAddress",p.address);
+  set("parkingFee",p.fee);
+  const note=document.getElementById("parkingNote");
+  if(note){
+    const status=p.status||"미정";
+    note.textContent=p.note ? `${status} · ${p.note}` : `${status} · 나중에 정하면 여기서 바로 입력하면 돼.`;
+  }
+}
+function openParkingEditor(){
+  if(!data.parking) data.parking={name:"",address:"",fee:"",status:"미정",note:""};
+  pName.value=data.parking.name||"";
+  pAddress.value=data.parking.address||"";
+  pFee.value=data.parking.fee||"";
+  pStatus.value=data.parking.status||"미정";
+  pNote.value=data.parking.note||"";
+  parkingDialog.showModal();
+}
+function saveParking(){
+  data.parking={
+    name:pName.value.trim(),
+    address:pAddress.value.trim(),
+    fee:pFee.value.trim(),
+    status:pStatus.value,
+    note:pNote.value.trim()
+  };
+  save();
+  renderParking();
+  parkingDialog.close();
+}
+
+function renderChecklist(){
+  const root=document.getElementById("checkgrid");
+  root.innerHTML=Object.entries(data.checklist).map(([cat,items])=>`
+    <div class="checkcard"><h4>${cat}</h4>
+      ${items.map(item=>{
+        const k=cat+"::"+item;
+        return `<label class="checkitem"><input type="checkbox" ${data.checked[k]?"checked":""} onchange="toggleCheck('${esc(cat)}','${esc(item)}',this.checked)">${esc(item)}</label>`
+      }).join("")}
+    </div>
+  `).join("");
+}
+function toggleCheck(cat,item,v){data.checked[cat+"::"+item]=v;save()}
+function render(){renderFilters();renderOverview();renderEvents();renderParking();renderChecklist();document.getElementById("memo").value=data.memo||""}
+function switchView(view,btn){
+  ["planView","eventsView","checkView","memoView"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+  document.getElementById(view+"View").classList.remove("hidden");
+  document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
+}
+function openAdd(){
+  editingId=null;document.getElementById("editorTitle").textContent="일정 추가";
+  fDate.value="2026-09-12";fTime.value="";fTitle.value="";fPlace.value="";fTransport.value="";fType.value="personal";fStatus.value="미정";fNote.value="";
+  document.querySelectorAll(".fPerson").forEach(c=>c.checked=true);editor.showModal();
+}
+function editItem(id){
+  editingId=id;const it=data.schedules.find(x=>x.id===id);if(!it)return;
+  editorTitle.textContent="일정 편집";fDate.value=it.date;fTime.value=it.time;fTitle.value=it.title;fPlace.value=it.place||"";
+  fTransport.value=it.transport||"";fType.value=it.type||"personal";fStatus.value=it.status||"미정";fNote.value=it.note||"";
+  document.querySelectorAll(".fPerson").forEach(c=>c.checked=(it.people||[]).includes(c.value));editor.showModal();
+}
+function saveEditor(){
+  const obj={
+    id:editingId||uid(),date:fDate.value,time:fTime.value.trim()||"시간 미정",title:fTitle.value.trim(),
+    place:fPlace.value.trim(),transport:fTransport.value,type:fType.value,status:fStatus.value,
+    people:[...document.queryS
