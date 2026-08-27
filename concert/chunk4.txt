@@ -1,0 +1,152 @@
+2:00",title:"짐 정리",place:"호텔",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"",note:"굿즈 · 포카 · 응원봉 · 충전기 확인"},
+    {id:"d3-03",date:"2026-09-14",time:"12:30",title:"최종 객실 확인",place:"호텔",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"",note:"빠진 물건 없는지 확인"},
+    {id:"d3-04",date:"2026-09-14",time:"13:00",title:"CHECK OUT",place:"아늑 시그니처 호텔 인천 구월",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"🚗 차량",note:"체크아웃 후 귀가 · 운전자 예린"}
+  ]
+};
+
+let data=load();
+let editingId=null;
+
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    return raw?JSON.parse(raw):clone(defaultData);
+  }catch(e){return clone(defaultData)}
+}
+async function loadCloud(){
+  try{
+    const url=CLOUD_ENDPOINT;
+    const res=await fetch(url,{method:"GET",cache:"no-store"});
+    if(!res.ok) throw new Error("cloud read failed");
+    const payload=await res.json();
+    if(payload && payload.data && Array.isArray(payload.data.schedules) && payload.data.schedules.length){
+      data=payload.data;
+      localStorage.setItem(KEY,JSON.stringify(data));
+      render();
+    }else{
+      await saveCloudNow();
+    }
+    cloudReady=true;
+    document.getElementById("saved").textContent="클라우드 저장됨 ✓";
+  }catch(e){
+    cloudReady=false;
+    document.getElementById("saved").textContent="오프라인 저장 중";
+  }
+}
+function save(){
+  document.getElementById("saved").textContent="저장 중…";
+  localStorage.setItem(KEY,JSON.stringify(data));
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(saveCloudNow,350);
+}
+async function saveCloudNow(){
+  try{
+    const url=CLOUD_ENDPOINT;
+    const res=await fetch(url,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({data})
+    });
+    if(!res.ok) throw new Error("cloud write failed");
+    cloudReady=true;
+    document.getElementById("saved").textContent="클라우드 저장됨 ✓";
+  }catch(e){
+    cloudReady=false;
+    document.getElementById("saved").textContent="오프라인 저장 중";
+  }
+}
+function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function uid(){return "id-"+Date.now()+"-"+Math.random().toString(36).slice(2,7)}
+function conflict(it){return (it.note||"").includes("⚠")}
+function isVip(it){return it.title.includes("SOUND CHECK")}
+function matchesPerson(it){return data.selectedPerson==="all"||(it.people||[]).includes(data.selectedPerson)}
+
+const days=[
+  ["2026-09-12","9월 12일 토요일","FIRST CONCERT · 사첵 나래/예린","first"],
+  ["2026-09-13","9월 13일 일요일","LAST CONCERT · 사첵 유지","last"],
+  ["2026-09-14","9월 14일 월요일","CHECK OUT · 13:00","out"]
+];
+
+const eventsData=[
+  {
+    group:"공식 / 콘서트 현장",
+    kind:"official",
+    badge:"OFFICIAL",
+    name:"KEEP IT MANIC · PLLI ZONE + A2T DRAW",
+    date:"9/12(토) – 9/13(일)",
+    time:"12:00 – 18:00",
+    place:"인천문학경기장 보조경기장",
+    address:"인천광역시 미추홀구 매소홀로 618 인천문학경기장",
+    desc:"당일 공연 티켓 + PLLI MEMBERSHIP + 신분증 확인 후 PLLI ZONE 포토카드 세트와 A2T DRAW in Incheon CARD 1장 제공. 1인 1일 1회. 대기 인원에 따라 18시 전 줄 마감 가능.",
+    status:"공식 확인",
+    map:"https://map.naver.com/p/search/%EC%9D%B8%EC%B2%9C%EB%AC%B8%ED%95%99%EA%B2%BD%EA%B8%B0%EC%9E%A5%20%EB%B3%B4%EC%A1%B0%EA%B2%BD%EA%B8%B0%EC%9E%A5",
+    source:"https://weverse.io/plave/notice/38104"
+  },
+  {
+    group:"팬 주최 / 콘서트 현장",
+    kind:"fan",
+    badge:"FAN EVENT",
+    name:"KEEP IT REST · 콘서트 쉼터 카페",
+    date:"9/12(토) – 9/13(일)",
+    time:"이벤트 운영시간 미공개",
+    place:"투썸플레이스 인천문학점 2층",
+    address:"인천광역시 미추홀구 매소홀로 590",
+    desc:"콘서트 관람객 대상 팬 주최 쉼터형 이벤트. 음료 구매 영수증 제시 시 무료 뽑기 이벤트, VR STAGE ZONE 〈흥흥흥〉 스페셜 비디오 VR 체험존 운영 안내가 확인됨. 실제 운영시간/진행 방식은 주최 공지 재확인 필요.",
+    status:"팬 주최 · 시간 확인 필요",
+    map:"https://map.naver.com/p/search/%ED%88%AC%EC%8D%B8%ED%94%8C%EB%A0%88%EC%9D%B4%EC%8A%A4%20%EC%9D%B8%EC%B2%9C%EB%AC%B8%ED%95%99%EC%A0%90",
+    source:"https://x.com/bame_ee"
+  },
+  {
+    group:"팬 주최 / 나눔",
+    kind:"fan",
+    badge:"GIVEAWAY",
+    name:"첫·막콘 팬 나눔 · 아크릴 스탠드 / 스티커 등",
+    date:"9/12(토) – 9/13(일)",
+    time:"당일 공지",
+    place:"인천문학경기장 일대 · 세부 위치 당일 공지",
+    address:"인천광역시 미추홀구 매소홀로 618",
+    desc:"콘서트 현장에서 진행되는 팬 나눔. 모니터 아크릴 스탠드 · 스티커 · 코롯토 등. 수량·위치·시간은 당일 공지 예정.",
+    status:"팬 주최 · 당일 확인",
+    map:"https://map.naver.com/p/search/%EC%9D%B8%EC%B2%9C%EB%AC%B8%ED%95%99%EA%B2%BD%EA%B8%B0%EC%9E%A5",
+    source:"https://x.com/bom_moong"
+  },
+  {
+    group:"팬 주최 / 나눔",
+    kind:"fan",
+    badge:"GIVEAWAY",
+    name:"막콘 팬 나눔 · 필통 / 노트 / 손거울 / 포카",
+    date:"9/13(일)",
+    time:"당일 공지",
+    place:"인천문학경기장 일대 · 세부 위치 당일 공지",
+    address:"인천광역시 미추홀구 매소홀로 618",
+    desc:"막콘 현장에서 진행되는 팬 나눔. 철제 필통 · 미니 줄노트 · 손거울 · 양면 포토카드 · 클릭커 등. 인증 방식과 세부 위치·시간은 당일 공지.",
+    status:"팬 주최 · 당일 확인",
+    map:"https://map.naver.com/p/search/%EC%9D%B8%EC%B2%9C%EB%AC%B8%ED%95%99%EA%B2%BD%EA%B8%B0%EC%9E%A5",
+    source:"https://x.com/breath_9999"
+  }
+];
+
+
+function renderFilters(){
+  const root=document.getElementById("personFilter");
+  const arr=[["all","ALL"],["yuji","유지"],["narae","나래"],["yerin","예린"]];
+  root.innerHTML=arr.map(([k,v])=>`<button class="pill ${data.selectedPerson===k?"active":""}" onclick="setPerson('${k}')">${v}</button>`).join("");
+}
+function setPerson(p){data.selectedPerson=p;save();render()}
+function renderOverview(){
+  const root=document.getElementById("overview");
+  root.innerHTML=days.map(([date,label,desc,cls])=>{
+    const items=data.schedules.filter(x=>x.date===date&&matchesPerson(x));
+    return `<section class="day">
+      <div class="dayhead ${cls}">
+        <div class="date">${label}</div>
+        <div class="desc">${desc}</div>
+      </div>
+      <div class="list">
+        ${items.map(it=>{
+          const names=(it.people||[]).map(p=>peopleName[p]).join(" · ");
+          const statusText=it.status==="확인 필요" ? " · 확인 필요" : "";
+          const conflictText=conflict(it) ? " · ⚠ 충돌" : "";
+          return `<article
+            class="event ${it.type==="official"?"official":""} ${isVip(it)?"vip":""} ${conflict(i
