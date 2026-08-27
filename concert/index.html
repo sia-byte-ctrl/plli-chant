@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAVE INCHEON PLANNER</title></head>
+<body style="font-family:system-ui,sans-serif;padding:24px">플래너 불러오는 중…<script>
+(async()=>{
+  const files=['chunk0.txt','chunk1.txt','chunk2.txt','chunk3.txt','chunk4.txt','chunk5.txt','chunk6.txt'];
+  const parts=await Promise.all(files.map(f=>fetch(f,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(f);return r.text()})));
+  document.open();document.write(parts.join(''));document.close();
+})().catch(e=>{document.body.innerHTML='<p>플래너를 불러오지 못했어. 새로고침해줘.</p>';console.error(e)});
+</script></body></html>
