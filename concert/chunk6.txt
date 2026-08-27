@@ -1,0 +1,41 @@
+electorAll(".fPerson:checked")].map(c=>c.value),note:fNote.value.trim()
+  };
+  if(!obj.title){alert("일정명을 입력해줘.");return}
+  if(editingId){const i=data.schedules.findIndex(x=>x.id===editingId);data.schedules[i]=obj}
+  else{
+    const indices=data.schedules.map((x,i)=>[x,i]).filter(([x])=>x.date===obj.date);
+    const pos=indices.length?indices.at(-1)[1]+1:data.schedules.length;data.schedules.splice(pos,0,obj)
+  }
+  save();render();editor.close();
+}
+function deleteItem(id){
+  if(!confirm("이 일정을 삭제할까?"))return;
+  data.schedules=data.schedules.filter(x=>x.id!==id);save();render();
+}
+function moveItem(id,dir){
+  const i=data.schedules.findIndex(x=>x.id===id);if(i<0)return;const j=i+dir;
+  if(j<0||j>=data.schedules.length||data.schedules[j].date!==data.schedules[i].date)return;
+  [data.schedules[i],data.schedules[j]]=[data.schedules[j],data.schedules[i]];save();render();
+}
+function resetData(){
+  if(!confirm("수정한 내용을 모두 지우고 기본 일정으로 돌아갈까?"))return;
+  data=clone(defaultData);save();render();
+}
+memo.addEventListener("input",e=>{data.memo=e.target.value;save()});
+
+// 일정 편집 모달: 창 바깥(백드롭)을 클릭하면 닫기
+function closeDialogOnBackdrop(dialogEl){
+  dialogEl.addEventListener("click",(e)=>{
+    const rect=dialogEl.getBoundingClientRect();
+    const outside=e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom;
+    if(outside) dialogEl.close();
+  });
+}
+closeDialogOnBackdrop(editor);
+closeDialogOnBackdrop(parkingDialog);
+
+render();
+loadCloud();
+</script>
+</body>
+</html>
