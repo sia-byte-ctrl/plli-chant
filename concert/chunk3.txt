@@ -1,34 +1,4 @@
-option>
-          <option>후보</option>
-          <option>확정</option>
-        </select>
-      </label>
-      <label class="full">메모<textarea id="pNote" placeholder="운영시간, 공연장까지 거리, 예약 여부 등"></textarea></label>
-    </div>
-    <div class="modalactions">
-      <button class="btn" onclick="parkingDialog.close()">취소</button>
-      <button class="btn red" onclick="saveParking()">저장</button>
-    </div>
-  </div>
-</dialog>
-
-<dialog id="editor">
-  <div class="modal">
-    <h3 id="editorTitle">일정 편집</h3>
-    <div class="formgrid">
-      <label>날짜
-        <select id="fDate">
-          <option value="2026-09-12">9/12 토</option>
-          <option value="2026-09-13">9/13 일</option>
-          <option value="2026-09-14">9/14 월</option>
-        </select>
-      </label>
-      <label>시간<input id="fTime" placeholder="예: 15:00"></label>
-      <label class="full">일정명<input id="fTitle"></label>
-      <label>장소<input id="fPlace"></label>
-      <label>이동수단
-        <select id="fTransport">
-          <option value="">없음</option><option>🚗 차량</option><option>🚇 지하철</option><option>🚕 택시</option><option>🚶 도보</option>
+option>🚶 도보</option>
         </select>
       </label>
       <label>유형
@@ -65,7 +35,6 @@ const defaultData={
   selectedPerson:"all",
   memo:"",
   parking:{name:"",address:"",fee:"",status:"미정",note:""},
-  customChecklist:[],
   checklist:{
     "티켓":["공연 티켓","VIP 확인","PLLI 멤버십","신분증"],
     "공연":["응원봉","응원봉 배터리","보조배터리","휴대폰","물"],
@@ -74,7 +43,7 @@ const defaultData={
   },
   checked:{},
   schedules:[
-    {id:"d1-01",date:"2026-09-12",time:"오전",title:"인천 이동",place:"",people:["yuji","narae","yerin"],type:"personal",status:"미정",transport:"🚗 차량",note:"출발시간 미정 · 차량 1대"},
+    {id:"d1-01",date:"2026-09-12",time:"오전",title:"인천 이동",place:"",people:["yuji","narae","yerin"],type:"personal",status:"미정",transport:"🚗 차량",note:"출발시간 미정 · 운전자 예린"},
     {id:"d1-02",date:"2026-09-12",time:"도착 후",title:"호텔에 차/짐 맡기기",place:"아늑 시그니처 호텔 인천 구월",people:["yuji","narae","yerin"],type:"personal",status:"확인 필요",transport:"🚗 차량",note:"체크인 전 차량 주차 및 짐 보관 가능 여부 확인 필요"},
     {id:"d1-03",date:"2026-09-12",time:"12:00",title:"VIP 본인확인 부스 오픈",place:"인천문학경기장",people:["narae","yerin"],type:"official",status:"확정",transport:"",note:"매표소 / VIP 본인확인 부스 오픈"},
     {id:"d1-04",date:"2026-09-12",time:"12:00–14:00",title:"PLLI ZONE",place:"인천문학경기장 보조경기장",people:["yuji","narae","yerin"],type:"official",status:"확정",transport:"🚶 도보",note:"공식 운영 12:00–18:00 · 나래/예린은 사첵 전 여유 있게 종료"},
@@ -93,4 +62,11 @@ const defaultData={
     {id:"d2-04",date:"2026-09-13",time:"13:00–14:00",title:"점심",place:"미정",people:["yuji","narae","yerin"],type:"personal",status:"미정",transport:"",note:"유지 사첵 전 식사"},
     {id:"d2-05",date:"2026-09-13",time:"14:20",title:"유지 사운드체크 준비",place:"주경기장 방향",people:["yuji"],type:"personal",status:"확정",transport:"🚶 도보",note:"신분증 · 티켓 · 물 · 화장실"},
     {id:"d2-06",date:"2026-09-13",time:"15:00",title:"VIP SOUND CHECK ENTRY",place:"인천문학경기장 주경기장",people:["yuji"],type:"official",status:"확정",transport:"",note:"막콘 사첵 입장 시작"},
-    {id:"d2-07
+    {id:"d2-07",date:"2026-09-13",time:"15:00–16:30",title:"FREE TIME",place:"호텔 / 카페 / 공연장",people:["narae","yerin"],type:"personal",status:"미정",transport:"",note:"호텔 복귀 · 카페 · 공연장 대기 중 선택"},
+    {id:"d2-08",date:"2026-09-13",time:"16:00",title:"SOUND CHECK",place:"인천문학경기장",people:["yuji"],type:"official",status:"확정",transport:"",note:"막콘 사첵 시작"},
+    {id:"d2-09",date:"2026-09-13",time:"16:30",title:"GENERAL ADMISSION",place:"인천문학경기장",people:["narae","yerin"],type:"official",status:"확정",transport:"",note:"전체 관객 입장 시작"},
+    {id:"d2-10",date:"2026-09-13",time:"19:00",title:"KEEP IT MANIC · LAST CONCERT",place:"인천문학경기장 주경기장",people:["yuji","narae","yerin"],type:"official",status:"확정",transport:"",note:"본공연 시작"},
+    {id:"d2-11",date:"2026-09-13",time:"공연 후",title:"호텔 복귀",place:"아늑 시그니처 호텔 인천 구월",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"🚇 지하철",note:"세 명 합류 후 복귀"},
+
+    {id:"d3-01",date:"2026-09-14",time:"오전",title:"늦잠 / 휴식",place:"호텔",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"",note:"막콘 다음날"},
+    {id:"d3-02",date:"2026-09-14",time:"10:00–1

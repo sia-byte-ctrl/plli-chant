@@ -1,14 +1,4 @@
-px);
-  border-radius:18px;box-shadow:0 12px 32px rgba(50,70,110,.12)
-}
-.bottom button{background:transparent;border:none;color:#7c879c;font-size:11px;font-weight:800;padding:7px}
-.bottom button.active{color:#2578aa}
-.hidden{display:none!important}
-
-@media(max-width:900px){
-  .overview{grid-template-columns:1fr}
-  .quick{grid-template-columns:repeat(2,1fr)}
-  .checkgrid{grid-template-columns:repeat(2,1fr)}
+r)}
   .day{border-radius:15px}
 }
 @media(max-width:620px){
@@ -43,7 +33,7 @@ px);
       <div class="q"><b>SEP 12 · FIRST</b><span>사첵: 나래 · 예린</span></div>
       <div class="q"><b>SEP 13 · LAST</b><span>사첵: 유지</span></div>
       <div class="q"><b>STAY</b><span>아늑 시그니처 인천 구월</span></div>
-      <div class="q"><b>CAR</b><span>1대 · 운전자: 나</span></div>
+      <div class="q"><b>CAR</b><span>1대 · DRIVER 예린</span></div>
     </div>
   </section>
 
@@ -72,7 +62,7 @@ px);
         <div class="row"><span>숙소</span><b>아늑 시그니처 호텔 인천 구월</b></div>
         <div class="row"><span>체크인</span><b>9/12 15:00</b></div>
         <div class="row"><span>체크아웃</span><b>9/14 13:00</b></div>
-        <div class="row"><span>차량</span><b>1대 · 운전자: 나</b></div>
+        <div class="row"><span>차량</span><b>1대 · 예린 운전</b></div>
       </div>
       <div class="card">
         <h3>CONCERT INFO</h3>
@@ -114,10 +104,7 @@ px);
   </section>
 
   <section id="checkView" class="hidden">
-    <div class="section-head">
-      <div><h2>체크리스트</h2><p>준비물 추가 · 체크 상태 모두 공용 자동 저장</p></div>
-      <div class="check-head-actions"><button class="btn primary" type="button" onclick="openSupplyEditor()">＋ 준비물 추가</button></div>
-    </div>
+    <div class="section-head"><div><h2>체크리스트</h2><p>체크 상태도 자동 저장</p></div></div>
     <div class="checkgrid" id="checkgrid"></div>
   </section>
 
@@ -136,24 +123,6 @@ px);
 
 
 
-<dialog id="supplyDialog">
-  <div class="modal">
-    <h3>준비물 추가</h3>
-    <div class="formgrid">
-      <label>분류
-        <select id="supplyCategory"></select>
-      </label>
-      <label class="full">준비물
-        <input id="supplyName" placeholder="예: 우비, 슬로건, 여분 렌즈">
-      </label>
-    </div>
-    <div class="modalactions">
-      <button class="btn" type="button" onclick="supplyDialog.close()">취소</button>
-      <button class="btn red" type="button" onclick="addSupply()">추가</button>
-    </div>
-  </div>
-</dialog>
-
 <dialog id="parkingDialog">
   <div class="modal">
     <h3>주차장 설정</h3>
@@ -164,3 +133,33 @@ px);
       <label>상태
         <select id="pStatus">
           <option>미정</option>
+          <option>후보</option>
+          <option>확정</option>
+        </select>
+      </label>
+      <label class="full">메모<textarea id="pNote" placeholder="운영시간, 공연장까지 거리, 예약 여부 등"></textarea></label>
+    </div>
+    <div class="modalactions">
+      <button class="btn" onclick="parkingDialog.close()">취소</button>
+      <button class="btn red" onclick="saveParking()">저장</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="editor">
+  <div class="modal">
+    <h3 id="editorTitle">일정 편집</h3>
+    <div class="formgrid">
+      <label>날짜
+        <select id="fDate">
+          <option value="2026-09-12">9/12 토</option>
+          <option value="2026-09-13">9/13 일</option>
+          <option value="2026-09-14">9/14 월</option>
+        </select>
+      </label>
+      <label>시간<input id="fTime" placeholder="예: 15:00"></label>
+      <label class="full">일정명<input id="fTitle"></label>
+      <label>장소<input id="fPlace"></label>
+      <label>이동수단
+        <select id="fTransport">
+          <option value="">없음</option><option>🚗 차량</option><option>🚇 지하철</option><option>🚕 택시</option><

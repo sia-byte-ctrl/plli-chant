@@ -1,72 +1,4 @@
-          : "";
-        return `<label class="checkitem">
-          <input type="checkbox" ${data.checked[k]?"checked":""} onchange="toggleCheckDecoded('${ec}','${ei}',this.checked)">
-          <span class="checktext">${esc(item)}</span>${del}
-        </label>`
-      }).join("")}
-    </div>
-  `).join("");
-}
-function toggleCheckDecoded(cat,item,v){
-  cat=decodeURIComponent(cat); item=decodeURIComponent(item);
-  data.checked[cat+"::"+item]=v;
-  save();
-}
-function openSupplyEditor(){
-  ensureChecklistData();
-  supplyCategory.innerHTML=Object.keys(data.checklist).map(cat=>`<option value="${esc(cat)}">${esc(cat)}</option>`).join("");
-  supplyName.value="";
-  supplyDialog.showModal();
-  setTimeout(()=>supplyName.focus(),50);
-}
-function addSupply(){
-  ensureChecklistData();
-  const cat=supplyCategory.value;
-  const item=supplyName.value.trim();
-  if(!item){supplyName.focus();return}
-  if(!data.checklist[cat]) data.checklist[cat]=[];
-  if(data.checklist[cat].some(x=>x.trim().toLowerCase()===item.toLowerCase())){
-    alert("이미 같은 준비물이 있어.");
-    return;
-  }
-  data.checklist[cat].push(item);
-  data.customChecklist.push({cat,item});
-  save();
-  renderChecklist();
-  supplyDialog.close();
-}
-function removeSupply(cat,item){
-  cat=decodeURIComponent(cat); item=decodeURIComponent(item);
-  if(!isCustomSupply(cat,item)) return;
-  if(!confirm(`"${item}" 준비물을 삭제할까?`)) return;
-  data.checklist[cat]=(data.checklist[cat]||[]).filter(x=>x!==item);
-  data.customChecklist=data.customChecklist.filter(x=>!(x.cat===cat && x.item===item));
-  delete data.checked[cat+"::"+item];
-  save();
-  renderChecklist();
-}
-function render(){renderFilters();renderOverview();renderEvents();renderParking();renderChecklist();document.getElementById("memo").value=data.memo||""}
-function switchView(view,btn){
-  ["planView","eventsView","checkView","memoView"].forEach(id=>document.getElementById(id).classList.add("hidden"));
-  document.getElementById(view+"View").classList.remove("hidden");
-  document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
-}
-function openAdd(){
-  editingId=null;document.getElementById("editorTitle").textContent="일정 추가";
-  fDate.value="2026-09-12";fTime.value="";fTitle.value="";fPlace.value="";fTransport.value="";fType.value="personal";fStatus.value="미정";fNote.value="";
-  document.querySelectorAll(".fPerson").forEach(c=>c.checked=true);editor.showModal();
-}
-function editItem(id){
-  editingId=id;const it=data.schedules.find(x=>x.id===id);if(!it)return;
-  editorTitle.textContent="일정 편집";fDate.value=it.date;fTime.value=it.time;fTitle.value=it.title;fPlace.value=it.place||"";
-  fTransport.value=it.transport||"";fType.value=it.type||"personal";fStatus.value=it.status||"미정";fNote.value=it.note||"";
-  document.querySelectorAll(".fPerson").forEach(c=>c.checked=(it.people||[]).includes(c.value));editor.showModal();
-}
-function saveEditor(){
-  const obj={
-    id:editingId||uid(),date:fDate.value,time:fTime.value.trim()||"시간 미정",title:fTitle.value.trim(),
-    place:fPlace.value.trim(),transport:fTransport.value,type:fType.value,status:fStatus.value,
-    people:[...document.querySelectorAll(".fPerson:checked")].map(c=>c.value),note:fNote.value.trim()
+electorAll(".fPerson:checked")].map(c=>c.value),note:fNote.value.trim()
   };
   if(!obj.title){alert("일정명을 입력해줘.");return}
   if(editingId){const i=data.schedules.findIndex(x=>x.id===editingId);data.schedules[i]=obj}
@@ -90,7 +22,6 @@ function resetData(){
   data=clone(defaultData);save();render();
 }
 memo.addEventListener("input",e=>{data.memo=e.target.value;save()});
-supplyName.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addSupply();}});
 
 // 일정 편집 모달: 창 바깥(백드롭)을 클릭하면 닫기
 function closeDialogOnBackdrop(dialogEl){
@@ -102,7 +33,6 @@ function closeDialogOnBackdrop(dialogEl){
 }
 closeDialogOnBackdrop(editor);
 closeDialogOnBackdrop(parkingDialog);
-closeDialogOnBackdrop(supplyDialog);
 
 render();
 loadCloud();
