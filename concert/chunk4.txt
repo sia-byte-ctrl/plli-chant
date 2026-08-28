@@ -1,6 +1,13 @@
-2:00",title:"짐 정리",place:"호텔",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"",note:"굿즈 · 포카 · 응원봉 · 충전기 확인"},
+date:"2026-09-13",time:"15:00–16:30",title:"FREE TIME",place:"호텔 / 카페 / 공연장",people:["narae","yerin"],type:"personal",status:"미정",transport:"",note:"호텔 복귀 · 카페 · 공연장 대기 중 선택"},
+    {id:"d2-08",date:"2026-09-13",time:"16:00",title:"SOUND CHECK",place:"인천문학경기장",people:["yuji"],type:"official",status:"확정",transport:"",note:"막콘 사첵 시작"},
+    {id:"d2-09",date:"2026-09-13",time:"16:30",title:"GENERAL ADMISSION",place:"인천문학경기장",people:["narae","yerin"],type:"official",status:"확정",transport:"",note:"전체 관객 입장 시작"},
+    {id:"d2-10",date:"2026-09-13",time:"19:00",title:"KEEP IT MANIC · LAST CONCERT",place:"인천문학경기장 주경기장",people:["yuji","narae","yerin"],type:"official",status:"확정",transport:"",note:"본공연 시작"},
+    {id:"d2-11",date:"2026-09-13",time:"공연 후",title:"호텔 복귀",place:"아늑 시그니처 호텔 인천 구월",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"🚇 지하철",note:"세 명 합류 후 복귀"},
+
+    {id:"d3-01",date:"2026-09-14",time:"오전",title:"늦잠 / 휴식",place:"호텔",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"",note:"막콘 다음날"},
+    {id:"d3-02",date:"2026-09-14",time:"10:00–12:00",title:"짐 정리",place:"호텔",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"",note:"굿즈 · 포카 · 응원봉 · 충전기 확인"},
     {id:"d3-03",date:"2026-09-14",time:"12:30",title:"최종 객실 확인",place:"호텔",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"",note:"빠진 물건 없는지 확인"},
-    {id:"d3-04",date:"2026-09-14",time:"13:00",title:"CHECK OUT",place:"아늑 시그니처 호텔 인천 구월",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"🚗 차량",note:"체크아웃 후 귀가 · 운전자 예린"}
+    {id:"d3-04",date:"2026-09-14",time:"13:00",title:"CHECK OUT",place:"아늑 시그니처 호텔 인천 구월",people:["yuji","narae","yerin"],type:"personal",status:"확정",transport:"🚗 차량",note:"체크아웃 후 귀가 · 차량 1대"}
   ]
 };
 
@@ -128,25 +135,4 @@ const eventsData=[
 ];
 
 
-function renderFilters(){
-  const root=document.getElementById("personFilter");
-  const arr=[["all","ALL"],["yuji","유지"],["narae","나래"],["yerin","예린"]];
-  root.innerHTML=arr.map(([k,v])=>`<button class="pill ${data.selectedPerson===k?"active":""}" onclick="setPerson('${k}')">${v}</button>`).join("");
-}
-function setPerson(p){data.selectedPerson=p;save();render()}
-function renderOverview(){
-  const root=document.getElementById("overview");
-  root.innerHTML=days.map(([date,label,desc,cls])=>{
-    const items=data.schedules.filter(x=>x.date===date&&matchesPerson(x));
-    return `<section class="day">
-      <div class="dayhead ${cls}">
-        <div class="date">${label}</div>
-        <div class="desc">${desc}</div>
-      </div>
-      <div class="list">
-        ${items.map(it=>{
-          const names=(it.people||[]).map(p=>peopleName[p]).join(" · ");
-          const statusText=it.status==="확인 필요" ? " · 확인 필요" : "";
-          const conflictText=conflict(it) ? " · ⚠ 충돌" : "";
-          return `<article
-            class="event ${it.type==="official"?"official":""} ${isVip(it)?"vip":""} ${conflict(i
+function re
