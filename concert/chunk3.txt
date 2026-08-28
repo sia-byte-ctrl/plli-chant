@@ -1,4 +1,4 @@
-tion>
+option>
           <option>후보</option>
           <option>확정</option>
         </select>
@@ -93,4 +93,4 @@ const defaultData={
     {id:"d2-04",date:"2026-09-13",time:"13:00–14:00",title:"점심",place:"미정",people:["yuji","narae","yerin"],type:"personal",status:"미정",transport:"",note:"유지 사첵 전 식사"},
     {id:"d2-05",date:"2026-09-13",time:"14:20",title:"유지 사운드체크 준비",place:"주경기장 방향",people:["yuji"],type:"personal",status:"확정",transport:"🚶 도보",note:"신분증 · 티켓 · 물 · 화장실"},
     {id:"d2-06",date:"2026-09-13",time:"15:00",title:"VIP SOUND CHECK ENTRY",place:"인천문학경기장 주경기장",people:["yuji"],type:"official",status:"확정",transport:"",note:"막콘 사첵 입장 시작"},
-    {id:"d2-07",
+    {id:"d2-07
