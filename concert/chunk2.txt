@@ -1,4 +1,4 @@
-);
+px);
   border-radius:18px;box-shadow:0 12px 32px rgba(50,70,110,.12)
 }
 .bottom button{background:transparent;border:none;color:#7c879c;font-size:11px;font-weight:800;padding:7px}
@@ -43,7 +43,7 @@
       <div class="q"><b>SEP 12 · FIRST</b><span>사첵: 나래 · 예린</span></div>
       <div class="q"><b>SEP 13 · LAST</b><span>사첵: 유지</span></div>
       <div class="q"><b>STAY</b><span>아늑 시그니처 인천 구월</span></div>
-      <div class="q"><b>CAR</b><span>1대 · 운전자 확정</span></div>
+      <div class="q"><b>CAR</b><span>1대 · 운전자: 나</span></div>
     </div>
   </section>
 
@@ -72,7 +72,7 @@
         <div class="row"><span>숙소</span><b>아늑 시그니처 호텔 인천 구월</b></div>
         <div class="row"><span>체크인</span><b>9/12 15:00</b></div>
         <div class="row"><span>체크아웃</span><b>9/14 13:00</b></div>
-        <div class="row"><span>차량</span><b>1대 · 운전자 확정</b></div>
+        <div class="row"><span>차량</span><b>1대 · 운전자: 나</b></div>
       </div>
       <div class="card">
         <h3>CONCERT INFO</h3>
