@@ -4,7 +4,101 @@
 <body style="font-family:system-ui,sans-serif;padding:24px">플래너 불러오는 중…<script>
 (async()=>{
   const files=['chunk0.txt','chunk1.txt','chunk2.txt','chunk3.txt','chunk4.txt','chunk5.txt','chunk6.txt'];
-  const parts=await Promise.all(files.map(f=>fetch(f,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(f);return r.text()})));
-  document.open();document.write(parts.join(''));document.close();
+  const parts=await Promise.all(files.map(f=>fetch(f+'?v=20260828-supplies1',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(f);return r.text()})));
+  let html=parts.join('');
+  const addon=String.raw`
+<style>
+.checkitem input{flex:none}
+.checkitem .checktext{flex:1;min-width:0;word-break:break-word}
+.checkdelete{flex:none;border:0;background:transparent;color:#a2a9b8;width:26px;height:26px;border-radius:8px;padding:0;font-size:15px;font-weight:800}
+.checkdelete:hover{background:#fff0f2;color:#c92b38}
+.check-head-actions{display:flex;align-items:center;gap:8px}
+</style>
+<script>
+(function(){
+  const checkSection=document.getElementById('checkView');
+  const head=checkSection&&checkSection.querySelector('.section-head');
+  if(head){
+    head.innerHTML='<div><h2>체크리스트</h2><p>준비물 추가 · 체크 상태 모두 공용 자동 저장</p></div><div class="check-head-actions"><button class="btn primary" type="button" onclick="openSupplyEditor()">＋ 준비물 추가</button></div>';
+  }
+
+  if(!document.getElementById('supplyDialog')){
+    document.body.insertAdjacentHTML('beforeend', '<dialog id="supplyDialog"><div class="modal"><h3>준비물 추가</h3><div class="formgrid"><label>분류<select id="supplyCategory"></select></label><label class="full">준비물<input id="supplyName" placeholder="예: 우비, 슬로건, 여분 렌즈"></label></div><div class="modalactions"><button class="btn" type="button" onclick="supplyDialog.close()">취소</button><button class="btn red" type="button" onclick="addSupply()">추가</button></div></div></dialog>');
+  }
+
+  function ensureChecklistData(){
+    if(!data.checklist || typeof data.checklist!=='object') data.checklist=JSON.parse(JSON.stringify(defaultData.checklist));
+    if(!data.checked || typeof data.checked!=='object') data.checked={};
+    if(!Array.isArray(data.customChecklist)) data.customChecklist=[];
+    if(!Array.isArray(defaultData.customChecklist)) defaultData.customChecklist=[];
+  }
+  function isCustomSupply(cat,item){
+    ensureChecklistData();
+    return data.customChecklist.some(x=>x.cat===cat&&x.item===item);
+  }
+  window.toggleCheckDecoded=function(cat,item,v){
+    cat=decodeURIComponent(cat);item=decodeURIComponent(item);
+    data.checked[cat+'::'+item]=v;save();
+  };
+  window.openSupplyEditor=function(){
+    ensureChecklistData();
+    const d=document.getElementById('supplyDialog');
+    const category=document.getElementById('supplyCategory');
+    const name=document.getElementById('supplyName');
+    category.innerHTML=Object.keys(data.checklist).map(cat=>'<option value="'+esc(cat)+'">'+esc(cat)+'</option>').join('');
+    name.value='';
+    d.showModal();
+    setTimeout(()=>name.focus(),50);
+  };
+  window.addSupply=function(){
+    ensureChecklistData();
+    const cat=document.getElementById('supplyCategory').value;
+    const name=document.getElementById('supplyName');
+    const item=name.value.trim();
+    if(!item){name.focus();return;}
+    if(!data.checklist[cat])data.checklist[cat]=[];
+    if(data.checklist[cat].some(x=>x.trim().toLowerCase()===item.toLowerCase())){alert('이미 같은 준비물이 있어.');return;}
+    data.checklist[cat].push(item);
+    data.customChecklist.push({cat,item});
+    save();renderChecklist();document.getElementById('supplyDialog').close();
+  };
+  window.removeSupply=function(cat,item){
+    cat=decodeURIComponent(cat);item=decodeURIComponent(item);
+    if(!isCustomSupply(cat,item))return;
+    if(!confirm('"'+item+'" 준비물을 삭제할까?'))return;
+    data.checklist[cat]=(data.checklist[cat]||[]).filter(x=>x!==item);
+    data.customChecklist=data.customChecklist.filter(x=>!(x.cat===cat&&x.item===item));
+    delete data.checked[cat+'::'+item];
+    save();renderChecklist();
+  };
+  renderChecklist=function(){
+    ensureChecklistData();
+    const root=document.getElementById('checkgrid');
+    root.innerHTML=Object.entries(data.checklist).map(([cat,items])=>'<div class="checkcard"><h4>'+esc(cat)+'</h4>'+items.map(item=>{
+      const k=cat+'::'+item,ec=encodeURIComponent(cat),ei=encodeURIComponent(item);
+      const del=isCustomSupply(cat,item)?'<button class="checkdelete" type="button" aria-label="삭제" title="추가한 준비물 삭제" onclick="event.preventDefault();event.stopPropagation();removeSupply(\''+ec+'\',\''+ei+'\')">×</button>':'';
+      return '<label class="checkitem"><input type="checkbox" '+(data.checked[k]?'checked':'')+' onchange="toggleCheckDecoded(\''+ec+'\',\''+ei+'\',this.checked)"><span class="checktext">'+esc(item)+'</span>'+del+'</label>';
+    }).join('')+'</div>').join('');
+  };
+
+  const supplyDialogEl=document.getElementById('supplyDialog');
+  if(typeof closeDialogOnBackdrop==='function')closeDialogOnBackdrop(supplyDialogEl);
+  document.getElementById('supplyName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSupply();}});
+
+  let corrected=false;
+  [defaultData,data].forEach(obj=>{
+    (obj.schedules||[]).forEach(s=>{
+      if(typeof s.note==='string'&&s.note.includes('운전자 예린')){s.note=s.note.replaceAll('운전자 예린','차량 1대');corrected=true;}
+      if(typeof s.note==='string'&&s.note.includes('예린 운전')){s.note=s.note.replaceAll('예린 운전','차량 1대');corrected=true;}
+    });
+  });
+  document.querySelectorAll('.q').forEach(q=>{if(q.querySelector('b')?.textContent.trim()==='CAR')q.querySelector('span').textContent='1대 · 운전자 확정';});
+  document.querySelectorAll('.card .row').forEach(r=>{if(r.querySelector('span')?.textContent.trim()==='차량'&&r.querySelector('b'))r.querySelector('b').textContent='1대 · 운전자 확정';});
+  if(corrected)save();
+  renderChecklist();
+})();
+<\/script>`;
+  html=html.replace('</body>',addon+'</body>');
+  document.open();document.write(html);document.close();
 })().catch(e=>{document.body.innerHTML='<p>플래너를 불러오지 못했어. 새로고침해줘.</p>';console.error(e)});
 </script></body></html>
