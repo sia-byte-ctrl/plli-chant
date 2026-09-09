@@ -5,12 +5,14 @@
 (async()=>{
   const baseVersion='20260828-stable1';
   const moduleVersion='20260905-schedule-manager-v2';
+  const checklistVersion='20260909-pack-v1';
   const files=['chunk0.txt','chunk1.txt','chunk2.txt','chunk3.txt','chunk4.txt','chunk5.txt','chunk6.txt'];
   const parts=await Promise.all(files.map(f=>fetch(f+'?v='+baseVersion,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(f);return r.text()})));
   let html=parts.join('');
   const supplyTag='<scr'+'ipt src="supplies.js?v='+baseVersion+'"></scr'+'ipt>';
   const scheduleTag='<scr'+'ipt src="schedule-manager.js?v='+moduleVersion+'"></scr'+'ipt>';
-  html=html.replace('</body>',supplyTag+scheduleTag+'</body>');
+  const checklistTag='<scr'+'ipt src="checklist-pack.js?v='+checklistVersion+'"></scr'+'ipt>';
+  html=html.replace('</body>',supplyTag+scheduleTag+checklistTag+'</body>');
   document.open();
   document.write(html);
   document.close();
